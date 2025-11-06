@@ -17,4 +17,9 @@ protected $fillable = [
     return $this->belongsToMany(Permission::class);
 }
 
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
 }

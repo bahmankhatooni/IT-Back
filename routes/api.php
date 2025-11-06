@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Http\Controllers\Api\ComputerController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -13,10 +12,11 @@ use App\Http\Middleware\CheckRole;
 
 Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
 
-// 🔐 Auth routes
+// 🔐 Public Auth routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// 🔒 Protected routes
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -29,26 +29,27 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/cities/{id}', [CityController::class, 'destroy'])->middleware('CheckRole:admin');
 
     // 🏢 Branches
-    Route::get('/branches', [BranchController::class, 'index'])->middleware('CheckRole:admin,city_user');
+    Route::get('/branches', [BranchController::class, 'index']);
     Route::post('/branches', [BranchController::class, 'store'])->middleware('CheckRole:admin,city_user');
     Route::put('/branches/{id}', [BranchController::class, 'update'])->middleware('CheckRole:admin,city_user');
     Route::delete('/branches/{id}', [BranchController::class, 'destroy'])->middleware('CheckRole:admin,city_user');
 
-    //Employee
-    Route::get('/employees', [EmployeeController::class, 'index'])->middleware('CheckRole:admin,city_user');
-    Route::get('/employees/form-data', [EmployeeController::class, 'formData'])->middleware('CheckRole:admin,city_user');
-    Route::post('/employees', [EmployeeController::class, 'store'])->middleware('CheckRole:admin,city_user');
-    Route::get('/employees/{id}', [EmployeeController::class, 'show'])->middleware('CheckRole:admin,city_user');
-    Route::put('/employees/{id}', [EmployeeController::class, 'update'])->middleware('CheckRole:admin,city_user');
-    Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->middleware('CheckRole:admin,city_user');
+    // 👥 Employees
+    Route::get('/employees', [EmployeeController::class, 'index']);
+    Route::get('/employees/form-data', [EmployeeController::class, 'formData']);
+    Route::post('/employees', [EmployeeController::class, 'store']);
+    Route::get('/employees/{id}', [EmployeeController::class, 'show']);
+    Route::put('/employees/{id}', [EmployeeController::class, 'update']);
+    Route::delete('/employees/{id}', [EmployeeController::class, 'destroy']);
 
-    //Computer
+    // 💻 Computers - همه routeها باید داخل auth باشند
     Route::get('/computers', [ComputerController::class, 'index']);
     Route::post('/computers', [ComputerController::class, 'store']);
     Route::get('/computers/{id}', [ComputerController::class, 'show']);
-    Route::put('/computers/{computer}', [ComputerController::class, 'update']);
+    Route::put('/computers/{id}', [ComputerController::class, 'update']);
     Route::delete('/computers/{id}', [ComputerController::class, 'destroy']);
-    // 👥 Users
+
+    // 👤 Users
     Route::prefix('users')->middleware('checkRole:admin')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::get('/{id}', [UserController::class, 'show']);
@@ -56,4 +57,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [UserController::class, 'update']);
         Route::delete('/{id}', [UserController::class, 'destroy']);
     });
+});
+
+// 🚫 Fallback route برای APIهای protected
+Route::fallback(function () {
+    return response()->json(['message' => 'Route پیدا نشد'], 404);
 });
