@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\ComputerController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\PrinterController;
+use App\Http\Controllers\Api\ScannerController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
@@ -18,9 +21,19 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // 🔒 Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-
+// 📊 Dashboard
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/stats', [DashboardController::class, 'getStats']);
+        Route::get('/recent-equipment', [DashboardController::class, 'getRecentEquipment']);
+    });
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    // 👤 Users
+        Route::get('/users', [UserController::class, 'index'])->middleware('CheckRole:admin');
+        Route::get('/users/{id}', [UserController::class, 'show'])->middleware('CheckRole:admin');
+        Route::post('/users', [UserController::class, 'store'])->middleware('CheckRole:admin');
+        Route::put('/users/{id}', [UserController::class, 'update'])->middleware('CheckRole:admin');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->middleware('CheckRole:admin');
 
     // 📍 Cities
     Route::get('/cities', [CityController::class, 'index'])->middleware('CheckRole:admin');
@@ -42,21 +55,31 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/employees/{id}', [EmployeeController::class, 'update']);
     Route::delete('/employees/{id}', [EmployeeController::class, 'destroy']);
 
-    // 💻 Computers - همه routeها باید داخل auth باشند
+    // 💻 Computers
     Route::get('/computers', [ComputerController::class, 'index']);
     Route::post('/computers', [ComputerController::class, 'store']);
     Route::get('/computers/{id}', [ComputerController::class, 'show']);
     Route::put('/computers/{id}', [ComputerController::class, 'update']);
     Route::delete('/computers/{id}', [ComputerController::class, 'destroy']);
 
-    // 👤 Users
-    Route::prefix('users')->middleware('checkRole:admin')->group(function () {
-        Route::get('/', [UserController::class, 'index']);
-        Route::get('/{id}', [UserController::class, 'show']);
-        Route::post('/', [UserController::class, 'store']);
-        Route::put('/{id}', [UserController::class, 'update']);
-        Route::delete('/{id}', [UserController::class, 'destroy']);
-    });
+    // 🖨️ Printers - اضافه کردن routeهای پرینتر
+    Route::get('/printers', [PrinterController::class, 'index']);
+    Route::post('/printers', [PrinterController::class, 'store']);
+    Route::get('/printers/{id}', [PrinterController::class, 'show']);
+    Route::put('/printers/{id}', [PrinterController::class, 'update']);
+    Route::delete('/printers/{id}', [PrinterController::class, 'destroy']);
+
+    // 📷 Scanners - اضافه کردن routeهای اسکنر
+    Route::get('/scanners', [ScannerController::class, 'index']);
+    Route::post('/scanners', [ScannerController::class, 'store']);
+    Route::get('/scanners/{id}', [ScannerController::class, 'show']);
+    Route::put('/scanners/{id}', [ScannerController::class, 'update']);
+    Route::delete('/scanners/{id}', [ScannerController::class, 'destroy']);
+
+
+
+
+
 });
 
 // 🚫 Fallback route برای APIهای protected
