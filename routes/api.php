@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ComputerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\PrinterController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ScannerController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -21,6 +22,14 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // 🔒 Protected routes
 Route::middleware('auth:sanctum')->group(function () {
+// در routes/api.php - در بخش routeهای مربوط به گزارشات
+
+// در routes/api.php
+    Route::get('/reports/computers', [ReportController::class, 'getComputers']);
+    Route::get('/reports/filter-options', [ReportController::class, 'getFilterOptions']);
+
+
+
 // 📊 Dashboard
     Route::prefix('dashboard')->group(function () {
         Route::get('/stats', [DashboardController::class, 'getStats']);
@@ -28,12 +37,18 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
-    // 👤 Users
-        Route::get('/users', [UserController::class, 'index'])->middleware('CheckRole:admin');
-        Route::get('/users/{id}', [UserController::class, 'show'])->middleware('CheckRole:admin');
-        Route::post('/users', [UserController::class, 'store'])->middleware('CheckRole:admin');
-        Route::put('/users/{id}', [UserController::class, 'update'])->middleware('CheckRole:admin');
-        Route::delete('/users/{id}', [UserController::class, 'destroy'])->middleware('CheckRole:admin');
+
+    // 👤 User Profile Routes (برای همه کاربران لاگین کرده)
+    Route::get('/user/profile', [UserController::class, 'profile']);
+    Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::put('/user/change-password', [UserController::class, 'changePassword']);
+
+    // 👤 Admin User Management (فقط برای ادمین)
+    Route::get('/users', [UserController::class, 'index'])->middleware('CheckRole:admin');
+    Route::get('/users/{id}', [UserController::class, 'show'])->middleware('CheckRole:admin');
+    Route::post('/users', [UserController::class, 'store'])->middleware('CheckRole:admin');
+    Route::put('/users/{id}', [UserController::class, 'update'])->middleware('CheckRole:admin');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->middleware('CheckRole:admin');
 
     // 📍 Cities
     Route::get('/cities', [CityController::class, 'index'])->middleware('CheckRole:admin');
