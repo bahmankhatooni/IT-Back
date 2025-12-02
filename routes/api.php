@@ -27,6 +27,10 @@ Route::middleware('auth:sanctum')->group(function () {
 // در routes/api.php
     Route::get('/reports/computers', [ReportController::class, 'getComputers']);
     Route::get('/reports/filter-options', [ReportController::class, 'getFilterOptions']);
+    Route::get('/reports/printers', [ReportController::class, 'getPrinters']);
+    Route::get('/reports/scanners', [ReportController::class, 'getScanners']);
+    Route::get('/reports/export', [ReportController::class, 'exportToExcel']);
+
 
 
 
@@ -90,9 +94,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/scanners/{id}', [ScannerController::class, 'show']);
     Route::put('/scanners/{id}', [ScannerController::class, 'update']);
     Route::delete('/scanners/{id}', [ScannerController::class, 'destroy']);
-
-
-
 
 
 });

@@ -7,6 +7,7 @@ use App\Models\Computer;
 use App\Models\City;
 use App\Models\Branch;
 use App\Models\Employee;
+use App\Models\Mb;
 use Illuminate\Http\Request;
 
 class ComputerController extends Controller
@@ -124,5 +125,14 @@ class ComputerController extends Controller
         return response()->json([
             'message' => 'سخت‌افزار با موفقیت حذف شد.'
         ]);
+    }
+
+    public function getmbs(Request $request)
+    {
+        // ارتباط با جدول‌های مرتبط
+        $query = Mb::all('name');
+
+
+        return response()->json($query);
     }
 }
